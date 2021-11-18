@@ -27,10 +27,10 @@ public class WebService {
      */
     public User getUserWithPostsRT(Long userId) {
         log.info("Getting user info with Rest Template");
-        User user = restTemplate.getForObject("http://localhost:9001/user/"+userId, User.class);
+        User user = restTemplate.getForObject("http://USER-SERVICE/user/"+userId, User.class);
 
         log.info("Getting posts of the user");
-        PostList postList = restTemplate.getForObject("http://localhost:9002/post/"+userId, PostList.class);
+        PostList postList = restTemplate.getForObject("http://POST-SERVICE/post/"+userId, PostList.class);
 
         log.info("Setting posts");
         user.setPosts(postList.getPosts());
@@ -44,10 +44,10 @@ public class WebService {
      * all the requests are made and function ends and returns a Mono object
      * Spring waits for all to finish then responds
      */
-    
+
     public Mono<UserWithPosts> getUserWithPostsWC(Long userId) {
         log.info("Getting user info");
-        WebClient userClient = builder.baseUrl("http://localhost:9001")
+        WebClient userClient = builder.baseUrl("http://USER-SERVICE")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
         Mono<User> userMono = userClient.get().uri("/user/" + userId)
@@ -56,7 +56,7 @@ public class WebService {
         userMono.subscribe(user -> log.info("Returned user:" + user));
 
         log.info("Getting posts");
-        WebClient postClient = builder.baseUrl("http://localhost:9002")
+        WebClient postClient = builder.baseUrl("http://POST-SERVICE")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
         Mono<PostList> postListMono= postClient.get().uri("/post/" + userId)
